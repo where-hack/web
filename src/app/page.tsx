@@ -1,280 +1,189 @@
 "use client";
 
-import { useState } from "react";
+import { Inter } from 'next/font/google';
 
-// 国际化配置
-const translations = {
-  zh: {
-    title: "WhereHack",
-    weekdays: ["日", "一", "二", "三", "四", "五", "六"],
-    months: [
-      "一月",
-      "二月",
-      "三月",
-      "四月",
-      "五月",
-      "六月",
-      "七月",
-      "八月",
-      "九月",
-      "十月",
-      "十一月",
-      "十二月",
-    ],
-    today: "今天",
-    prevMonth: "上个月",
-    nextMonth: "下个月",
-    events: "事件",
-    noEvents: "暂无事件",
-  },
-  en: {
-    title: "WhereHack",
-    weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    months: [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ],
-    today: "Today",
-    prevMonth: "Previous month",
-    nextMonth: "Next month",
-    events: "events",
-    noEvents: "No events",
-  },
-};
+const inter = Inter({ subsets: ['latin'] });
 
-// UTC Unix timestamp 结构
-interface ICalendarCell {
-  day: number;
-  timestamp: number;
-}
-
-const makeUTCDate = (year: number, month: number, day: number): number =>
-  Date.UTC(year, month, day, 0, 0, 0, 0);
-
-const getUTCDay = (timestamp: number): number =>
-  new Date(timestamp).getUTCDate();
-
-const getUTCMonth = (timestamp: number): number =>
-  new Date(timestamp).getUTCMonth();
-
-const getUTCYear = (timestamp: number): number =>
-  new Date(timestamp).getUTCFullYear();
-
-// 生成日历网格
-function getCalendarCells(selectedTimestamp: number): ICalendarCell[] {
-  const year = getUTCYear(selectedTimestamp);
-  const month = getUTCMonth(selectedTimestamp);
-
-  const getDaysInMonth = (y: number, m: number) =>
-    new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
-
-  const getFirstDayOfMonth = (y: number, m: number) =>
-    new Date(Date.UTC(y, m, 1)).getUTCDay();
-
-  const daysInMonth = getDaysInMonth(year, month);
-  const firstDayOfMonth = getFirstDayOfMonth(year, month);
-  const daysInPrevMonth = getDaysInMonth(year, month - 1);
-
-  const prevCells = Array.from({ length: firstDayOfMonth }, (_, i) => {
-    const day = daysInPrevMonth - firstDayOfMonth + i + 1;
-    return { day, timestamp: makeUTCDate(year, month - 1, day) };
-  });
-
-  const currentCells = Array.from({ length: daysInMonth }, (_, i) => ({
-    day: i + 1,
-    timestamp: makeUTCDate(year, month, i + 1),
-  }));
-
-  const nextCells = Array.from(
-    { length: (7 - ((prevCells.length + currentCells.length) % 7)) % 7 },
-    (_, i) => ({ day: i + 1, timestamp: makeUTCDate(year, month + 1, i + 1) }),
-  );
-
-  return [...prevCells, ...currentCells, ...nextCells];
-}
-
-// 计算属性
-const isCurrentMonth = (cellTs: number, selectedTs: number): boolean =>
-  getUTCYear(cellTs) === getUTCYear(selectedTs) &&
-  getUTCMonth(cellTs) === getUTCMonth(selectedTs);
-
-const isToday = (cellTs: number): boolean => {
-  const today = new Date();
-  const todayStr = today.toISOString().slice(0, 10);
-  const cellStr = new Date(cellTs).toISOString().slice(0, 10);
-  return todayStr === cellStr;
-};
-
-// 主要组件
 export default function Home() {
-  const [lang, setLang] = useState<"zh" | "en">("zh");
-  const [selectedTimestamp, setSelectedTimestamp] = useState<number>(
-    Date.now(),
-  );
-
-  const t = translations[lang];
-  const cells = getCalendarCells(selectedTimestamp);
-
-  // 格式化显示
-  const formatMonthYear = (ts: number): string => {
-    const month = t.months[getUTCMonth(ts)];
-    const year = getUTCYear(ts);
-    return lang === "zh" ? `${year}年 ${month}` : `${month} ${year}`;
-  };
-
-  const handlePrevMonth = () => {
-    const currentMonth = getUTCMonth(selectedTimestamp);
-    const currentYear = getUTCYear(selectedTimestamp);
-    const newMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const newYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-    setSelectedTimestamp(makeUTCDate(newYear, newMonth, 1));
-  };
-
-  const handleNextMonth = () => {
-    const currentMonth = getUTCMonth(selectedTimestamp);
-    const currentYear = getUTCYear(selectedTimestamp);
-    const newMonth = currentMonth === 11 ? 0 : currentMonth + 1;
-    const newYear = currentMonth === 11 ? currentYear + 1 : currentYear;
-    setSelectedTimestamp(makeUTCDate(newYear, newMonth, 1));
-  };
-
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">{t.title}</h1>
+    <div className={`relative w-[1440px] h-[1931px] bg-white ${inter.className}`}>
+      {/* WhereHack Title */}
+      <div className="absolute w-[138px] h-[29px] left-[128px] top-[64px]">
+        <h1 className="font-bold text-[24px] leading-[29px] text-black">
+          WhereHack
+        </h1>
+      </div>
 
-          {/* 语言切换 */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setLang("zh")}
-              className={`px-3 py-1 text-sm rounded ${lang === "zh" ? "bg-primary text-primary-foreground" : "border"}`}
-            >
-              中文
-            </button>
-            <button
-              onClick={() => setLang("en")}
-              className={`px-3 py-1 text-sm rounded ${lang === "en" ? "bg-primary text-primary-foreground" : "border"}`}
-            >
-              EN
-            </button>
+      {/* Header Controls */}
+      <div className="absolute flex flex-row items-start gap-[10px] w-[249px] h-[44px] left-[128px] top-[141px]">
+        {/* Date Selector */}
+        <div className="flex flex-col items-center w-[44px] h-[44px] border border-[#E5E5E5] rounded-[4px]">
+          <div className="flex flex-row justify-center items-center w-[44px] h-[22px] bg-black">
+            <span className="font-bold text-[14px] leading-[17px] text-white">SEP</span>
+          </div>
+          <div className="flex flex-row justify-center items-center w-[44px] h-[22px]">
+            <span className="font-bold text-[14px] leading-[17px] text-black">12</span>
           </div>
         </div>
 
-        {/* 日历头部 - 原设计样式 */}
-        <div className="flex items-center gap-3 mb-4 p-4 border-b">
-          {/* Today按钮 - 学习原版设计 */}
-          <button
-            onClick={() => setSelectedTimestamp(Date.now())}
-            className="flex size-14 flex-col items-start overflow-hidden border"
-          >
-            <p className="flex h-6 w-full items-center justify-center bg-primary text-center text-xs font-semibold text-primary-foreground">
-              {new Date()
-                .toLocaleString(lang === "zh" ? "zh-CN" : "en-US", {
-                  month: "short",
-                })
-                .toUpperCase()}
-            </p>
-            <p className="flex w-full items-center justify-center text-lg font-bold">
-              {new Date().getDate()}
-            </p>
-          </button>
-
-          {/* 月份导航 */}
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-semibold">
-                {formatMonthYear(selectedTimestamp)}
-              </span>
-              <span className="px-1.5 py-0.5 text-xs border rounded">
-                0 {t.events}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handlePrevMonth}
-                className="size-6.5 px-0 flex items-center justify-center border rounded hover:bg-accent"
-                title={t.prevMonth}
-              >
-                ←
-              </button>
-              <p className="text-sm text-muted-foreground">
-                {lang === "zh" ? "第1周 - 第5周" : "Week 1 - Week 5"}
-              </p>
-              <button
-                onClick={handleNextMonth}
-                className="size-6.5 px-0 flex items-center justify-center border rounded hover:bg-accent"
-                title={t.nextMonth}
-              >
-                →
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* 日历主体 - 精确还原原版结构 */}
-        <div>
-          {/* 星期标题 - divide-x 无边框容器 */}
-          <div className="grid grid-cols-7 divide-x">
-            {t.weekdays.map((day) => (
-              <div key={day} className="flex items-center justify-center py-2">
-                <span className="text-xs font-medium text-muted-foreground">
-                  {day}
-                </span>
-              </div>
-            ))}
-          </div>
-          {/* 日期网格 - overflow-hidden + 内部边框 */}
-          <div className="grid grid-cols-7 overflow-hidden">
-            {cells.map((cell, idx) => {
-              const current = isCurrentMonth(cell.timestamp, selectedTimestamp);
-              const today = isToday(cell.timestamp);
-              const isSunday = new Date(cell.timestamp).getUTCDay() === 0;
-
-              return (
-                <div
-                  key={idx}
-                  className={`flex h-full flex-col gap-1 border-l border-t py-1.5 lg:py-2 ${
-                    isSunday ? "border-l-0" : ""
-                  }`}
-                >
-                  {/* 日期数字 - 正确样式 */}
-                  <span
-                    className={`h-6 px-1 text-xs font-semibold lg:px-2 ${
-                      today
-                        ? "flex w-6 translate-x-1 items-center justify-center rounded-full bg-primary px-0 font-bold text-primary-foreground"
-                        : ""
-                    } ${!current ? "opacity-20" : ""}`}
-                  >
-                    {cell.day}
-                  </span>
-
-                  {/* 事件占位区 - 照搬原版 */}
-                  <div
-                    className={`flex h-6 gap-1 px-2 lg:h-[94px] lg:flex-col lg:gap-2 lg:px-0 ${
-                      !current ? "opacity-50" : ""
-                    }`}
-                  >
-                    {[0, 1, 2].map((pos) => (
-                      <div key={pos} className="lg:flex-1" />
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+        {/* Month and Event Count */}
+        <div className="flex flex-row items-center gap-[10px] w-[195px] h-[17px]">
+          <span className="font-bold text-[14px] leading-[17px] text-black">September 2025</span>
+          <div className="flex flex-row justify-center items-center px-[6px] py-[3px] border-[0.5px] border-[#E5E5E5] rounded-[2px]">
+            <span className="font-medium text-[8px] leading-[10px] text-[#555555]">25 hackathons</span>
           </div>
         </div>
       </div>
-    </main>
+
+      {/* Calendar Container */}
+      <div className="absolute w-[1240px] h-[680px] left-[100px] top-[166px]">
+        {/* Calendar Grid */}
+        <div className="absolute flex flex-col items-start w-[1240px] h-[637px] left-0 top-[43px] border border-[#E5E5E5]">
+          
+          {/* Week Header */}
+          <div className="flex flex-row items-start w-[1240px] h-[32px]">
+            {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day, index) => (
+              <div key={day} className="flex flex-col justify-center items-center flex-1 h-[32px] relative">
+                <span className="font-normal text-[12px] leading-[15px] text-black">{day}</span>
+                {index < 6 && (
+                  <div className="absolute right-0 w-[1px] h-[32px] bg-[#E5E5E5]"></div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Separator */}
+          <div className="w-[1240px] h-[1px] bg-[#E5E5E5]"></div>
+
+          {/* Week 1 */}
+          <div className="flex flex-row items-start w-[1240px] h-[120px]">
+            {[
+              { day: '31', color: '#D2D2D2' },
+              { day: '1', color: '#000000' },
+              { day: '2', color: '#000000' },
+              { day: '3', color: '#000000' },
+              { day: '4', color: '#000000' },
+              { day: '5', color: '#000000' },
+              { day: '6', color: '#000000' }
+            ].map((item, index) => (
+              <div key={`week1-${index}`} className="flex flex-col items-start p-[8px] gap-[10px] flex-1 h-[120px] relative">
+                <span className="font-normal text-[12px] leading-[15px]" style={{ color: item.color }}>
+                  {item.day}
+                </span>
+                {index < 6 && (
+                  <div className="absolute right-0 w-[1px] h-[120px] bg-[#E5E5E5]"></div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Separator */}
+          <div className="w-[1240px] h-[1px] bg-[#E5E5E5]"></div>
+
+          {/* Week 2 */}
+          <div className="flex flex-row items-start w-[1240px] h-[120px]">
+            {['7', '8', '9', '10', '11', '12', '13'].map((day, index) => (
+              <div key={`week2-${index}`} className="flex flex-col items-start p-[8px] gap-[10px] flex-1 h-[120px] relative">
+                <span className="font-normal text-[12px] leading-[15px] text-black">{day}</span>
+                {index < 6 && (
+                  <div className="absolute right-0 w-[1px] h-[120px] bg-[#E5E5E5]"></div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Separator */}
+          <div className="w-[1240px] h-[1px] bg-[#E5E5E5]"></div>
+
+          {/* Week 3 */}
+          <div className="flex flex-row items-start w-[1240px] h-[120px]">
+            {['14', '15', '16', '17', '18', '19', '20'].map((day, index) => (
+              <div key={`week3-${index}`} className="flex flex-col items-start p-[8px] gap-[10px] flex-1 h-[120px] relative">
+                <span className="font-normal text-[12px] leading-[15px] text-black">{day}</span>
+                {index < 6 && (
+                  <div className="absolute right-0 w-[1px] h-[120px] bg-[#E5E5E5]"></div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Separator */}
+          <div className="w-[1240px] h-[1px] bg-[#E5E5E5]"></div>
+
+          {/* Week 4 */}
+          <div className="flex flex-row items-start w-[1240px] h-[120px]">
+            {['21', '22', '23', '24', '25', '26', '27'].map((day, index) => (
+              <div key={`week4-${index}`} className="flex flex-col items-start gap-[10px] flex-1 h-[120px] relative" style={{ padding: index === 1 ? '4.5px' : '8px' }}>
+                {index === 1 ? (
+                  // Special styling for day 22
+                  <div className="flex flex-col justify-center items-center w-[22px] h-[22px] bg-[#FF6464] rounded-[11px]">
+                    <span className="font-normal text-[12px] leading-[15px] text-white">22</span>
+                  </div>
+                ) : (
+                  <span className="font-normal text-[12px] leading-[15px] text-black">{day}</span>
+                )}
+                {index < 6 && (
+                  <div className="absolute right-0 w-[1px] h-[120px] bg-[#E5E5E5]"></div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Separator */}
+          <div className="w-[1240px] h-[1px] bg-[#E5E5E5]"></div>
+
+          {/* Week 5 */}
+          <div className="flex flex-row items-start w-[1240px] h-[120px]">
+            {[
+              { day: '28', color: '#000000' },
+              { day: '29', color: '#000000' },
+              { day: '30', color: '#000000' },
+              { day: '1', color: '#D2D2D2' },
+              { day: '2', color: '#D2D2D2' },
+              { day: '3', color: '#D2D2D2' },
+              { day: '4', color: '#D2D2D2' }
+            ].map((item, index) => (
+              <div key={`week5-${index}`} className="flex flex-col items-start p-[8px] gap-[10px] flex-1 h-[120px] relative">
+                <span className="font-normal text-[12px] leading-[15px]" style={{ color: item.color }}>
+                  {item.day}
+                </span>
+                {index < 6 && (
+                  <div className="absolute right-0 w-[1px] h-[120px] bg-[#E5E5E5]"></div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Events Overlay */}
+        <div className="absolute w-[1240px] h-[637px] left-0 top-[43px]">
+          {/* AdventureX 2025 Event */}
+          <div className="absolute flex flex-row items-center gap-[4px] w-[347px] h-[20px] left-[181px] top-[429px] bg-[#CFE9FF] rounded-[4px]">
+            <div className="w-[24px] h-[24px] bg-[#349DF4] rounded-[4px]"></div>
+            <span className="font-normal text-[10px] leading-[12px] text-[#085798]">AdventureX 2025</span>
+          </div>
+
+          {/* Rebuild-Z Event */}
+          <div className="absolute flex flex-row items-center gap-[4px] w-[347px] h-[20px] left-[363px] top-[455px] bg-[#CFE9FF] rounded-[4px]">
+            <div className="w-[24px] h-[24px] bg-[#349DF4] rounded-[4px]"></div>
+            <span className="font-normal text-[10px] leading-[12px] text-[#085798]">Rebuild-Z</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Decorative Lines */}
+      <div className="absolute w-[100px] h-0 left-0 top-[209px] border border-[#E5E5E5]"></div>
+      <div className="absolute w-[100px] h-0 left-0 top-[846px] border border-[#E5E5E5]"></div>
+      <div className="absolute w-[100px] h-0 left-[1340px] top-[846px] border border-[#E5E5E5]"></div>
+      <div className="absolute w-[100px] h-0 left-[1340px] top-[209px] border border-[#E5E5E5]"></div>
+      <div className="absolute w-[1440px] h-0 left-0 top-[117px] border border-[#E5E5E5]"></div>
+      <div className="absolute w-[1440px] h-0 left-0 top-[1803px] border border-[#E5E5E5]"></div>
+      
+      {/* Vertical Lines */}
+      <div className="absolute w-[209px] h-0 left-[100px] top-0 border border-[#E5E5E5] origin-top-left rotate-[-90deg]"></div>
+      <div className="absolute w-[1085px] h-0 left-[100px] top-[846px] border border-[#E5E5E5] origin-top-left rotate-[-90deg]"></div>
+      <div className="absolute w-[1085px] h-0 left-[1340px] top-[846px] border border-[#E5E5E5] origin-top-left rotate-[-90deg]"></div>
+      <div className="absolute w-[209px] h-0 left-[1340px] top-0 border border-[#E5E5E5] origin-top-left rotate-[-90deg]"></div>
+    </div>
   );
 }
