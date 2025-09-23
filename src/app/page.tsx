@@ -105,7 +105,7 @@ export default function Home() {
                       
                       {/* AdventureX 2025 Event - 从22号开始跨越2个单元格 */}
                       {index === 1 && (
-                        <div className="absolute flex flex-row items-center gap-[4px] h-[20px] top-[50px] bg-[#CFE9FF] rounded-[4px] z-10" style={{ width: 'calc(200% + 1px)' }}>
+                        <div className="absolute flex flex-row items-center gap-[4px] h-[20px] top-[30px] bg-[#CFE9FF] rounded-[4px] z-10" style={{ width: 'calc(200% + 1px)' }}>
                           <div className="w-[24px] h-[24px] bg-[#349DF4] rounded-[4px]"></div>
                           <span className="font-normal text-[10px] leading-[12px] text-[#085798]">AdventureX 2025</span>
                         </div>
@@ -113,7 +113,7 @@ export default function Home() {
                       
                       {/* Rebuild-Z Event - 从23号开始跨越2个单元格 */}
                       {index === 2 && (
-                        <div className="absolute flex flex-row items-center gap-[4px] h-[20px] top-[75px] bg-[#CFE9FF] rounded-[4px] z-10" style={{ width: 'calc(200% + 1px)' }}>
+                        <div className="absolute flex flex-row items-center gap-[4px] h-[20px] top-[65px] bg-[#CFE9FF] rounded-[4px] z-10" style={{ width: 'calc(200% + 1px)' }}>
                           <div className="w-[24px] h-[24px] bg-[#349DF4] rounded-[4px]"></div>
                           <span className="font-normal text-[10px] leading-[12px] text-[#085798]">Rebuild-Z</span>
                         </div>
