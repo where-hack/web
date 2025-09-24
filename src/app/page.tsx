@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white flex justify-center">
       <div
-        className={`relative w-[1440px] h-[1931px] bg-white ${inter.className}`}
+        className={`relative w-full h-screen bg-white ${inter.className}`}
       >
         {/* WhereHack Title */}
         <div className="absolute w-[138px] h-[29px] left-[128px] top-[64px]">
@@ -47,7 +47,7 @@ export default function Home() {
         </div>
 
         {/* Calendar Container */}
-        <div className="absolute w-[1240px] h-[680px] left-[100px] top-[166px]">
+        <div className="absolute w-[1240px] h-[680px] left-1/2 -translate-x-[620px] top-[166px]">
           {/* Calendar Table - 完全连贯的网格 */}
           <div className="absolute w-[1240px] h-[637px] left-0 top-[43px] border border-[#E5E5E5]">
             <table className="w-full h-full border-collapse">
@@ -221,13 +221,13 @@ export default function Home() {
 
         {/* Border Frame - 3 horizontal lines, 2 vertical lines */}
         {/* Top horizontal line - extends full width */}
-        <div className="absolute w-screen h-[1px] left-0 top-[209px] bg-[#E5E5E5]"></div>
+        <div className="fixed w-screen h-[1px] left-0 top-[209px] bg-[#E5E5E5]"></div>
 
         {/* Middle horizontal line - extends full width */}
-        <div className="absolute w-screen h-[1px] left-0 top-[117px] bg-[#E5E5E5]"></div>
+        <div className="fixed w-screen h-[1px] left-0 top-[117px] bg-[#E5E5E5]"></div>
 
         {/* Bottom horizontal line - extends full width */}
-        <div className="absolute w-screen h-[1px] left-0 top-[846px] bg-[#E5E5E5]"></div>
+        <div className="fixed w-screen h-[1px] left-0 top-[846px] bg-[#E5E5E5]"></div>
 
         {/* Left vertical line - extends full height */}
         <div className="absolute w-[1px] h-screen left-[100px] top-0 bg-[#E5E5E5]"></div>
